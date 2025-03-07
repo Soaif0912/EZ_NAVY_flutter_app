@@ -13,7 +13,8 @@ class ProductPageController extends GetxController {
   HttpService httpService = HttpService();
 
   var products = <ProductModel>[].obs;
-  var userCartList = <int>[].obs;
+  var userCartList = <Map>[].obs;
+  var cartCount = 0.obs;
   var categories = <String>[].obs;
   var isLoading = false.obs;
   var selectedCategory = Rxn<String>();
@@ -82,12 +83,25 @@ class ProductPageController extends GetxController {
   Future<void> fetchuserCart() async{
     final allUsreCartDetails = await httpService.apiGetRequest(ApiUrls.baseUrl+ApiUrls.userCartDatails);
     if(allUsreCartDetails.status == true){
+      
       print('fetching userCartList success =>>');
+      print(allUsreCartDetails.data);
 
-      userCartList.value = allUsreCartDetails.data.where((user)=> user['userId'] == currentUserId).map<int>((user)=> (user['productId'] as num).toInt() ).toList();
+      List<Map<String, dynamic>> filteredCart = List<Map<String, dynamic>>.from(allUsreCartDetails.data.where((user)=> user['userId'] == currentUserId).toList());
+      userCartList.value = filteredCart;
+      print('filtered cart ${filteredCart}');
 
-      print('userCartList: ${userCartList}');
+      cartCount.value = 0;
+      filteredCart.forEach((item) {
+        cartCount.value += item['productQuantity'] as int; 
+      });
+
+      print('Total cart count ${cartCount}');
     }
+  }
+
+  bool checkProductInCart(int id){
+    return userCartList.any((product) => product['productId'] == id);
   }
 
   // Add to cart function
@@ -126,6 +140,8 @@ class ProductPageController extends GetxController {
         final addToCartRequest = await httpService.apiPostRequest(ApiUrls.baseUrl+ApiUrls.userCartDatails, bodyData);
         if(addToCartRequest.status == true){
           print('add to cart details: ${addToCartRequest.data}');
+          cartCount += 1;
+          fetchuserCart();
         }else{
           showError(addToCartRequest.errorMessage!);
         }
@@ -136,6 +152,8 @@ class ProductPageController extends GetxController {
         final updateCartRequest = await httpService.apiPutRequest(finalUrl, productInCart);
         if(updateCartRequest.status == true){
           print('update cart details: ${updateCartRequest.data}');
+          cartCount += 1;
+          fetchuserCart();
         }else{
           showError(updateCartRequest.errorMessage!);
         }

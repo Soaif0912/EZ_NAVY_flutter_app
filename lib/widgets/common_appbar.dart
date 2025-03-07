@@ -1,3 +1,4 @@
+import 'package:ez_navy_app/controller/product_page_controller/product_page_controller.dart';
 import 'package:ez_navy_app/global_data/global_data.dart';
 import 'package:ez_navy_app/routes/routes.dart';
 import 'package:ez_navy_app/routes/routes_names.dart';
@@ -10,9 +11,9 @@ class CommonAppBar extends StatelessWidget {
   final String title;
   final String? text;
 
-  const CommonAppBar(
-      {super.key, required this.iscartPage, required this.title, this.text});
+  CommonAppBar({super.key, required this.iscartPage, required this.title, this.text});
 
+      final ProductPageController controller = Get.put(ProductPageController());
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.sizeOf(context);
@@ -71,11 +72,12 @@ class CommonAppBar extends StatelessWidget {
                   const SizedBox(
                     width: 10,
                   ),
+                  
                   GestureDetector(
                     onTap: () => pushNamed(routeName: RoutesName.cartPage),
-                    child: const Badge(
-                      label: Text('0'),
-                      child: Icon(
+                    child: Badge(
+                      label: Obx(()=> Text('${controller.cartCount}')),
+                      child: const Icon(
                         Icons.shopping_bag_outlined,
                         size: 30,
                         color: Color.fromRGBO(11, 34, 62, 1),

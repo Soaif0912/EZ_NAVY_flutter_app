@@ -17,8 +17,8 @@ class CartPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(50),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(50),
         child: CommonAppBar(iscartPage: true, title: 'Cart',),
       ),
       body: const SingleChildScrollView(

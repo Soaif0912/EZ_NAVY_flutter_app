@@ -22,8 +22,8 @@ class ProductPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: const PreferredSize(
-        preferredSize: Size.fromHeight(90),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(90),
         child: CommonAppBar(iscartPage: false, title: 'Products', text: 'Product & Customer Credentials',)
       ),
       body: Padding(
@@ -207,26 +207,30 @@ class ProductCard extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            ElevatedButton(
-              onPressed: ()=> controller.addTocart(product.id),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
-                  side: const BorderSide(
-                    color: Color.fromRGBO(11, 34, 62, 1),
-                    width: 2,
+            Obx((){
+              return ElevatedButton(
+                onPressed: ()=> controller.addTocart(product.id),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(100),
+                    side: const BorderSide(
+                      color: Color.fromRGBO(11, 34, 62, 1),
+                      width: 2,
+                    ),
                   ),
                 ),
-              ),
-              child: const Text('Add To Cart',
-                  style: TextStyle(
-                    color: Color.fromRGBO(11, 34, 62, 1),
-                  )),
-            ),
+                child: Text(controller.checkProductInCart(product.id) ? 'View Cart' : 'Add to cart',
+                    style: const TextStyle(
+                      color: Color.fromRGBO(11, 34, 62, 1),
+                    )),
+              );
+            }),
           ],
         ),
       ),
     );
   }
+  
+  obx(Null Function() param0) {}
 }
