@@ -23,9 +23,12 @@ class ProductPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(90),
-        child: CommonAppBar(iscartPage: false, title: 'Products', text: 'Product & Customer Credentials',)
-      ),
+          preferredSize: const Size.fromHeight(90),
+          child: CommonAppBar(
+            iscartPage: false,
+            title: 'Products',
+            text: 'Product & Customer Credentials',
+          )),
       body: Padding(
         padding: EdgeInsets.only(
           left: width * 0.05,
@@ -35,7 +38,6 @@ class ProductPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Title Row
-            
 
             Padding(
               padding: EdgeInsets.only(top: height * 0.020),
@@ -207,30 +209,49 @@ class ProductCard extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            Obx((){
-              return ElevatedButton(
-                onPressed: ()=> controller.addTocart(product.id),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
-                    side: const BorderSide(
-                      color: Color.fromRGBO(11, 34, 62, 1),
-                      width: 2,
-                    ),
-                  ),
-                ),
-                child: Text(controller.checkProductInCart(product.id) ? 'View Cart' : 'Add to cart',
-                    style: const TextStyle(
-                      color: Color.fromRGBO(11, 34, 62, 1),
-                    )),
-              );
+            Obx(() {
+              return
+               Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        border: Border.all(width: 1, color: Colors.blue),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child:  
+                      controller.checkProductInCart(product.id)
+                      ?
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: ()=> controller.decreaseProductCount(product.id),
+                            child: Text('-', style: TextStyle(fontSize: 30),),
+                          ),
+                          Spacer(),
+                          Text('${controller.checkPoductCount(product.id)}', style: TextStyle(fontSize: 20)),
+                          Spacer(),
+                          InkWell(
+                            onTap: ()=> controller.addTocart(product.id),
+                            child: Text('+', style: TextStyle(fontSize: 25)),
+                          )
+                        ],
+                      ) :
+                      InkWell(
+                        onTap: ()=> controller.addTocart(product.id),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 7),
+                          child: Text('Add to cart',
+                          style: TextStyle(
+                            color: Color.fromRGBO(11, 34, 62, 1),
+                            fontSize: 20,
+                          )),
+                        ),
+                      ),
+                    );
+                  
             }),
           ],
         ),
       ),
     );
   }
-  
-  obx(Null Function() param0) {}
 }

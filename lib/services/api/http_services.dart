@@ -80,6 +80,30 @@ class HttpService {
   }
 
 
+  Future<ApiBaseDataModel> apiDeleteRequest(String apiUrl) async {
+    http.Client client = http.Client();
+
+    try{
+      final response = await client.delete(Uri.parse(apiUrl));
+
+      if(response.statusCode == 200){
+        return ApiBaseDataModel(status: true, data: jsonDecode(response.body));
+      }
+      else{
+        return ApiBaseDataModel(status: false, errorMessage: 'an error happend');
+      }
+    } on TimeoutException{
+      return ApiBaseDataModel(status: false, errorMessage: 'Server request timeout');
+    } on SocketException{
+      return ApiBaseDataModel(status: false, errorMessage: 'Internet connection faild');
+    }catch(e){
+      return ApiBaseDataModel(status: false, errorMessage: e.toString());
+    } finally{
+      client.close();
+    }
+  }
+
+
   Future<ApiBaseDataModel> getRequest(
     String url, {
     Map<String, String>? bodyData,

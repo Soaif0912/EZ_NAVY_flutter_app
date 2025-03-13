@@ -13,7 +13,7 @@ class ProductPageController extends GetxController {
   HttpService httpService = HttpService();
 
   var products = <ProductModel>[].obs;
-  var userCartList = <Map>[].obs;
+  var userCartList = <Map<String, dynamic>>[].obs;
   var cartCount = 0.obs;
   var categories = <String>[].obs;
   var isLoading = false.obs;
@@ -104,6 +104,12 @@ class ProductPageController extends GetxController {
     return userCartList.any((product) => product['productId'] == id);
   }
 
+  int checkPoductCount(int id){
+    Map newProduct =  userCartList.firstWhere((item)=> item['productId'] == id );
+
+    return newProduct['productQuantity'];
+  }
+
   // Add to cart function
   Future<void> addTocart(int id) async{
     final productId = id;
@@ -111,26 +117,10 @@ class ProductPageController extends GetxController {
     Map<String, dynamic> productInCart={};
     String productCartId = '0';
 
-    final allUsreCartDetails = await httpService.apiGetRequest(ApiUrls.baseUrl+ApiUrls.userCartDatails);
-
-    if(allUsreCartDetails.status == true){
-      print('product ID: $productId');
-      print(allUsreCartDetails.data);
-
-      for(var user in allUsreCartDetails.data){
-        if( user['userId'] == currentUserId && user['productId'] == productId ){
-          productAlreaduInCart = true;
-          print('order ID: ${user['id']}');
-
-          productCartId = user['id'].toString();
-          productInCart = {
-            "userId": currentUserId,
-            "productId": productId,
-            "productQuantity": user['productQuantity'] + 1,
-          };
-        }
-      }
-
+    for (var item in userCartList) {
+      if(item['productId'] == productId){ productAlreaduInCart = true;} 
+    }
+ 
       if(productAlreaduInCart == false){
         Map<String, dynamic> bodyData = {
           "userId": currentUserId,
@@ -146,6 +136,10 @@ class ProductPageController extends GetxController {
           showError(addToCartRequest.errorMessage!);
         }
       }else{
+        productInCart = userCartList.firstWhere((item)=> item['productId'] == productId );
+        productInCart['productQuantity'] +=1;
+        productCartId = productInCart['id'].toString();
+
         final finalUrl = '${ApiUrls.baseUrl}${ApiUrls.userCartDatails}/$productCartId';
         print('update URL: ${finalUrl}');
 
@@ -159,9 +153,39 @@ class ProductPageController extends GetxController {
         }
       }
 
-    }
-
   }
+
+  Future<void> decreaseProductCount(int id) async{
+    
+    int productID = id;
+    Map<String, dynamic> inUserCart = userCartList.firstWhere((item) => item['productId'] == productID );
+    String orderId = inUserCart['id'];
+    int thisProductCountInCart = inUserCart['productQuantity'];
+
+    final finalUrl = '${ApiUrls.baseUrl}${ApiUrls.userCartDatails}/$orderId';
+
+    if(thisProductCountInCart ==1){
+
+      final deletedProduct = await httpService.apiDeleteRequest(finalUrl);
+
+      if(deletedProduct.status == true){
+        print(deletedProduct.data);
+        userCartList.value = userCartList.where((item) => item['productId'] != productID).toList();
+      }
+    }else if(thisProductCountInCart > 1){
+
+      inUserCart['productQuantity'] -= 1;
+      final decreasedProduct = await httpService.apiPutRequest(finalUrl, inUserCart);
+
+      if(decreasedProduct.status == true){
+        print('decreased ${decreasedProduct.data}');
+        cartCount -= 1;
+        fetchuserCart();
+      }
+    }
+  } 
+
+
 
   @override
   void onClose() {
