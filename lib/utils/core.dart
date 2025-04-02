@@ -34,6 +34,12 @@ mixin InputValidationMixin {
 
 
 void showLoader() {
+  Get.closeAllSnackbars();
+  // Close any existing dialogs
+  if (Get.isDialogOpen ?? false) {
+    Get.back(closeOverlays: true);
+  }
+
   Get.dialog(
     const PopScope(
       canPop: false,
@@ -45,13 +51,14 @@ void showLoader() {
   );
 }
 
-void hideLoader() {
+void hideLoader() async{
   if (Get.isDialogOpen ?? false) {
     Get.back(); 
   }
 }
 
 void showError(String message) {
+  Get.closeAllSnackbars();
   Get.snackbar(
     "Error",
     message,
@@ -63,6 +70,7 @@ void showError(String message) {
 }
 
 void showSuccess(String message) {
+  Get.closeAllSnackbars();
   Get.snackbar(
     "Error",
     message,

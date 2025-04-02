@@ -64,7 +64,7 @@ class CommonAppBar extends StatelessWidget {
                         textCancel: "No",
                         onConfirm: () {
                           GlobalDataManager().removeUserId();
-                          pushNamed(routeName: RoutesName.loginPage);
+                          pushRemoveUntill(routeName: RoutesName.loginPage);
                         },
                       );
                     },
